@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webcam Jerusalén - Control de Referrer</title>
+    <style>
+        /* Estilos para centrar el reproductor con un diseño oscuro elegante */
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #1a1a1a;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #ffffff;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            margin-bottom: 25px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        /* Contenedor responsivo proporcional (Relación de aspecto 16:9) */
+        .video-box {
+            position: relative;
+            width: 100%;
+            max-width: 850px;
+            padding-bottom: 56.25%; /* Mantiene las dimensiones del video perfectas */
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            background-color: #000000;
+        }
+
+        /* Ajuste absoluto del iframe dentro de su contenedor */
+        .video-box iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Transmisión en Vivo: Jerusalén</h1>
+
+    <div class="video-box">
+        <iframe 
+            width="560" 
+            height="315" 
+            src="https://www.youtube.com/embed/e34xb-Fbl0U?autoplay=1&mute=1&controls=1&rel=0" 
+            title="YouTube video player" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            referrerpolicy="strict-origin-when-cross-origin" 
+            allowfullscreen>
+        </iframe>
+    </div>
+
+</body>
+</html>
