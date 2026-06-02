@@ -32,20 +32,27 @@
         }
 
         if (m3u8Original && typeof Hls !== "undefined" && Hls.isSupported()) {
-            // ✅ Pasar la M3U8 por el proxy de Cloudflare
-            const m3u8Proxy = `${WORKER_URL}/?url=${encodeURIComponent(m3u8Original)}`;
+    const m3u8Proxy = `${WORKER_URL}/?url=${encodeURIComponent(m3u8Original)}`;
 
-            const hls = new Hls({ enableWorker: true, lowLatencyMode: true });
-            hls.loadSource(m3u8Proxy);
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                video.play().catch(() => {});
-            });
-            hls.on(Hls.Events.ERROR, (_, data) => {
-                console.error("HLS error:", data.type, data.details);
-                if (data.fatal) usarYouTubeFallback();
-            });
-        } else {
+    const hls = new Hls({
+        enableWorker: true,
+        lowLatencyMode: true,
+        // ✅ Agregar header para saltar la advertencia de ngrok
+        xhrSetup: function(xhr, url) {
+            xhr.setRequestHeader("ngrok-skip-browser-warning", "true");
+        }
+    });
+
+    hls.loadSource(m3u8Proxy);
+    hls.attachMedia(video);
+    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        video.play().catch(() => {});
+    });
+    hls.on(Hls.Events.ERROR, (_, data) => {
+        console.error("HLS error:", data.type, data.details);
+        if (data.fatal) usarYouTubeFallback();
+    });
+} else {
             usarYouTubeFallback();
         }
     </script>
