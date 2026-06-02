@@ -1,36 +1,49 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Player</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #000; width: 100vw; height: 100vh; overflow: hidden; }
-        iframe { 
-            width: 100%; 
-            height: 100%; 
-            border: 0; 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-        }
+        video { width: 100%; height: 100%; }
+        #error { color: #fff; padding: 20px; font-family: sans-serif; }
     </style>
 </head>
 <body>
+    <video id="v" controls muted autoplay playsinline></video>
+    <div id="error" style="display:none"></div>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
     <script>
         const params = new URLSearchParams(location.search);
         const videoId = params.get("v") || "e34xb-Fbl0U";
+        const video = document.getElementById("v");
+        const errorDiv = document.getElementById("error");
 
-        const iframe = document.createElement("iframe");
+        // Obtener URL M3U8 fresca via yt-dlp en tu servidor
+        // Por ahora usar la URL directa que pasas como parámetro
+        const m3u8 = params.get("m3u8");
 
-        // ❌ Sin autoplay — Power BI bloquea reproducción automática
-        iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=0&controls=1&rel=0&modestbranding=1`;
-        
-        iframe.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen");
-        iframe.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
-        iframe.setAttribute("allowfullscreen", "true");
-        document.body.appendChild(iframe);
+        if (m3u8 && Hls.isSupported()) {
+            const hls = new Hls({ enableWorker: false });
+            hls.loadSource(decodeURIComponent(m3u8));
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(() => {}));
+            hls.on(Hls.Events.ERROR, (_, data) => {
+                if (data.fatal) {
+                    errorDiv.style.display = "block";
+                    errorDiv.textContent = "Error cargando stream: " + data.details;
+                }
+            });
+        } else {
+            // Fallback: iframe YouTube normal
+            const iframe = document.createElement("iframe");
+            iframe.style.cssText = "width:100%;height:100%;border:0;position:absolute;top:0;left:0";
+            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=1`;
+            iframe.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture");
+            iframe.setAttribute("allowfullscreen", "true");
+            document.body.appendChild(iframe);
+            video.remove();
+        }
     </script>
 </body>
 </html>
